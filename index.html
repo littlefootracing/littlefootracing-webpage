@@ -1016,7 +1016,6 @@
     <li><a href="#about">About</a></li>
     <li><a href="#why">Our Why</a></li>
     <li><a href="#build">Build Journal</a></li>
-    <li><a href="#team">The Crew</a></li>
     <li><a href="#events">Events</a></li>
     <li><a href="#running">5K Runs</a></li>
   </ul>
@@ -1097,7 +1096,7 @@
           </div>
           <div class="spec-row">
             <span class="spec-key">Color</span>
-            <span class="spec-val">Classic Red</span>
+            <span class="spec-val">Silver</span>
           </div>
           <div class="spec-row">
             <span class="spec-key">Vibe</span>
@@ -1167,11 +1166,6 @@
     </div>
 
     <div>
-      <div class="why-pullquote reveal reveal-delay-1">
-        We don't race to win. We race to <span>remember</span> — to honor a son we loved, to live fully in his name, and to make sure he is never forgotten.
-      </div>
-
-      <div class="why-pledge reveal reveal-delay-2">
         <div class="pledge-label">🏁 First Lap Dedication</div>
         <div class="pledge-text">
           When this car crosses a timing line for the first time, that lap belongs to <span>him.</span> Every lap after that too.
@@ -1189,12 +1183,12 @@
 
   <!-- TABS -->
   <div class="timeline-tabs reveal">
-    <button class="tab-btn active" onclick="switchTab('build')">🔧 Car Build</button>
-    <button class="tab-btn" onclick="switchTab('races')">🏁 Race Timeline</button>
+    <button class="tab-btn" onclick="switchTab('build')">🔧 Car Build</button>
+    <button class="tab-btn active" onclick="switchTab('races')">🏁 Race Timeline</button>
   </div>
 
   <!-- ===== TAB: CAR BUILD ===== -->
-  <div class="tab-pane active" id="tab-build">
+  <div class="tab-pane" id="tab-build">
 
     <div class="build-progress-wrap">
       <div class="build-progress-label">
@@ -1231,7 +1225,7 @@
                 <div class="timeline-title">🐂 The Ox Acquired</div>
                 <span class="timeline-status status-done">Done ✓</span>
               </div>
-              <div class="timeline-desc">1992 Mazda Miata acquired and christened <strong>The Ox</strong>. Classic red, 1.6L, honest and stubborn. The build begins.</div>
+              <div class="timeline-desc">1992 Mazda Miata acquired and christened <strong>The Ox</strong>. Silver, 1.6L, honest and stubborn. The build begins.</div>
             </div>
           </div>
 
@@ -1294,17 +1288,6 @@
             </div>
           </div>
 
-          <div class="timeline-entry reveal reveal-delay-3">
-            <div class="timeline-dot dot-pending"></div>
-            <div class="timeline-card">
-              <div class="timeline-header">
-                <div class="timeline-title">📟 Digital Dash</div>
-                <span class="timeline-status status-pending">Upcoming</span>
-              </div>
-              <div class="timeline-desc">iPad Mini digital dashboard via MegaSquirt — live RPM, coolant temp, oil pressure and more. The Ox will have the most modern brain in the garage.</div>
-            </div>
-          </div>
-
           <div class="timeline-entry reveal">
             <div class="timeline-dot dot-pending"></div>
             <div class="timeline-card">
@@ -1363,7 +1346,7 @@
   </div>
 
   <!-- ===== TAB: RACE TIMELINE ===== -->
-  <div class="tab-pane" id="tab-races">
+  <div class="tab-pane active" id="tab-races">
     <div class="build-layout">
       <div>
         <div class="timeline">
@@ -1495,13 +1478,13 @@
 
 </section>
 
-<!-- TEAM -->
+<!-- TEAM SECTION TEMPORARILY HIDDEN
 <section class="team-section" id="team">
   <p class="section-tag reveal">The Crew</p>
   <h2 class="section-title reveal">The Humans<br><span style="color:var(--yellow)">Behind the Helmet</span></h2>
-
   <div class="team-grid" id="crew-render"></div>
 </section>
+-->
 
 <!-- EVENTS -->
 <section class="events-section" id="events">
@@ -1638,6 +1621,7 @@
 
   function renderCrew(crew) {
     const el = document.getElementById('crew-render');
+    if (!el) return; // section is hidden, skip gracefully
     if (!crew || !crew.length) { el.innerHTML = ''; return; }
     el.innerHTML = crew.map((m, i) => `
       <div class="team-card ${m.tribute ? 'tribute' : ''} reveal reveal-delay-${Math.min(i,4)}">
@@ -1647,14 +1631,14 @@
         <div class="member-bio">${esc(m.bio)}</div>
       </div>
     `).join('');
-    // re-observe new elements
     el.querySelectorAll('.reveal').forEach(r => observer.observe(r));
   }
 
   function renderTrackEvents(track) {
     const el = document.getElementById('track-render');
     const rbest = document.getElementById('track-results-render');
-    if (!track || !track.length) { el.innerHTML = '<p style="color:var(--muted);padding:20px 0">No events scheduled yet.</p>'; rbest.innerHTML=''; return; }
+    if (!el) return;
+    if (!track || !track.length) { el.innerHTML = '<p style="color:var(--muted);padding:20px 0">No events scheduled yet.</p>'; if (rbest) rbest.innerHTML=''; return; }
 
     const sorted = [...track].sort((a,b) => (a.date||'').localeCompare(b.date||''));
     el.innerHTML = sorted.map((e, i) => {
@@ -1677,7 +1661,7 @@
     }).join('');
     el.querySelectorAll('.reveal').forEach(r => observer.observe(r));
 
-    // Best times sidebar — only events with lap times
+    if (!rbest) return;
     const withTimes = sorted.filter(e => e.laptime);
     if (!withTimes.length) { rbest.innerHTML = '<p style="color:var(--muted);font-size:14px;padding:8px 0">No lap times recorded yet.</p>'; return; }
     rbest.innerHTML = withTimes.map((e,i) => `
@@ -1696,7 +1680,8 @@
   function renderRuns(runs) {
     const el = document.getElementById('runs-render');
     const pb = document.getElementById('runs-pb-render');
-    if (!runs || !runs.length) { el.innerHTML = '<p style="color:var(--muted);padding:20px 0">No runs scheduled yet.</p>'; pb.innerHTML=''; return; }
+    if (!el) return;
+    if (!runs || !runs.length) { el.innerHTML = '<p style="color:var(--muted);padding:20px 0">No runs scheduled yet.</p>'; if (pb) pb.innerHTML=''; return; }
 
     const sorted = [...runs].sort((a,b) => (a.date||'').localeCompare(b.date||''));
     el.innerHTML = sorted.map((r, i) => {
@@ -1720,7 +1705,7 @@
     }).join('');
     el.querySelectorAll('.reveal').forEach(r => observer.observe(r));
 
-    // PB sidebar — completed runs with finish times
+    if (!pb) return;
     const done = sorted.filter(r => r.finish);
     if (!done.length) { pb.innerHTML = '<p style="color:var(--muted);font-size:14px;padding:8px 0">No finish times recorded yet.</p>'; return; }
     pb.innerHTML = done.map(r => `
@@ -1738,46 +1723,15 @@
 
   // ===== STATIC CONTENT — edit these to update the site =====
 
-  const CREW = [
-    {
-      emoji: '🧢',
-      name: 'Driver / Team Lead',
-      role: 'Behind the Wheel',
-      bio: "The one who has to explain to the family why there's a Miata in the living room budget. Loves a good late brake and hates traffic cones. Personally.",
-      tribute: false
-    },
-    {
-      emoji: '🔧',
-      name: 'Crew Chief',
-      role: 'Wrenches & Wisdom',
-      bio: "If it's broken, they fix it. If it's not broken, they make it faster. The real reason the car starts on race day. Speaks fluent Miata.",
-      tribute: false
-    },
-    {
-      emoji: '⭐',
-      name: 'Our Inspiration',
-      role: 'Always With Us',
-      bio: "The reason for the name. Our son, loved completely and held briefly. He is the heart of this team — in the name on the car, the number on the door, and everything we do on the track.",
-      tribute: true
-    }
-  ];
-
   const TRACK_EVENTS = [
-    { name: 'Spring Opener — Track Day',   date: '2025-03-15', location: 'Your Local Track', time: '7:00 AM Gates', status: 'past',     laptime: '1:42.8' },
-    { name: 'Time Attack Round 1',          date: '2025-04-26', location: 'Your Local Track', time: '8:00 AM Gates', status: 'upcoming',  laptime: '' },
-    { name: 'Memorial Weekend Track Day',   date: '2025-05-18', location: 'Your Local Track', time: '7:30 AM Gates', status: 'upcoming',  laptime: '' },
-    { name: 'Summer Solstice Time Attack',  date: '2025-06-21', location: 'Your Local Track', time: '7:00 AM Gates', status: 'upcoming',  laptime: '' },
-    { name: 'Fall Classic — Season Finale', date: '2025-09-13', location: 'Your Local Track', time: '8:00 AM Gates', status: 'upcoming',  laptime: '' },
+    { name: 'First Track Day — Little Foot', date: '2026-04-01', location: 'TBD', time: 'TBD', status: 'upcoming', laptime: '' },
   ];
 
   const RUNS = [
-    { name: 'Angel Dash',                  date: '2026-05-01', type: '5K Run/Walk', location: 'TBD',             time: 'TBD',           status: 'upcoming', finish: '' },
-    { name: 'Spring into Action 5K',       date: '2026-06-01', type: '5K Run/Walk', location: 'Your Local Park', time: '8:00 AM Start', status: 'upcoming', finish: '' },
-    { name: "Mother's Day Community Walk", date: '2026-07-01', type: '5K Walk',     location: 'City Riverfront', time: '9:00 AM Start', status: 'upcoming', finish: '' },
+    { name: 'Angel Dash',            date: '2026-05-01', type: '5K Run/Walk', location: 'TBD', time: 'TBD', status: 'upcoming', finish: '' },
   ];
 
   // ===== RENDER =====
-  renderCrew(CREW);
   renderTrackEvents(TRACK_EVENTS);
   renderRuns(RUNS);
 </script>
